@@ -1,9 +1,21 @@
-# HiTechCloud Pay - SDK cho Laravel
+# HiTechCloud - SDK cho Laravel
 
-[![Latest Version](https://img.shields.io/packagist/v/hitechcloud/laravel-hitechcloudpay.svg)](https://packagist.org/packages/hitechcloud/laravel-hitechcloudpay)
+[![Latest Version](https://img.shields.io/packagist/v/hitechcloud-vietnam/laravel-hitechcloudpay.svg)](https://packagist.org/packages/hitechcloud-vietnam/laravel-hitechcloudpay)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-SDK Laravel chính thức cho **HiTechCloud Pay** - nền tảng thanh toán toàn diện của HiTechCloud: cổng thanh toán (QR VietQR/NAPAS, thẻ quốc tế, ví điện tử), Pay API v2 (tài khoản ngân hàng, tài khoản ảo, giao dịch), webhook biến động số dư, loa thông báo SoundBox, hoá đơn điện tử và Open Banking (BankHub).
+SDK Laravel chính thức cho toàn bộ hệ sinh thái **HiTechCloud** - một gói duy nhất cho nhiều sản phẩm:
+
+- **Pay** - cổng thanh toán (QR VietQR/NAPAS, thẻ, ví), Pay API v2 (tài khoản ngân hàng, VA, giao dịch), webhook biến động số dư, loa SoundBox, hoá đơn điện tử, Open Banking (BankHub).
+- **eKYC / VNeID** - cổng đại lý C06 (ekyc-c06.hitechcloud.vn, ký RSA/JWS).
+- **POS** - HiTechPos (pos.hitechcloud.vn).
+- **Omnichannel** - hội thoại đa kênh (omni.hitechcloud.vn).
+- **CRM** - quản lý quan hệ khách hàng (crm-gateways.hitechcloud.vn).
+- **WAF** - tường lửa ứng dụng web VCWAF (vcwaf.hitechcloud.vn).
+- **Sale AI** - bot bán hàng AI (sale-ai.hitechcloud.vn).
+- **API Tools** - bộ công cụ tra cứu (api-tools.hitechcloud.vn).
+- **User API** - API khách hàng (api.hitechcloud.vn).
+
+Mỗi sản phẩm nằm trong một namespace riêng dưới `HiTechCloud\` và được truy cập qua manager/facade hợp nhất `HiTechCloud`, hoặc trực tiếp (ví dụ facade `HiTechCloudPay` cho module Pay).
 
 Tài liệu API gốc: <https://developers.hitechcloud.vn>
 
@@ -40,7 +52,7 @@ Gói này cung cấp một client thuần PHP, có Facade tiện dụng, bao tr�
 ## Cài đặt
 
 ```bash
-composer require hitechcloud/laravel-hitechcloudpay
+composer require hitechcloud-vietnam/laravel-hitechcloudpay
 ```
 
 Gói hỗ trợ **auto-discovery**. Nếu cần, bạn có thể publish file config:
@@ -49,7 +61,18 @@ Gói hỗ trợ **auto-discovery**. Nếu cần, bạn có thể publish file co
 php artisan vendor:publish --tag=hitechcloudpay-config
 ```
 
-File `config/hitechcloudpay.php` sẽ được tạo ra.
+File `config/hitechcloudpay.php` sẽ được tạo ra (chứa cấu hình cho tất cả module).
+
+### Migrations
+
+SDK đi kèm migration tạo 3 bảng: `htc_pay_webhook_events` (nhật ký webhook, dedup theo `event_id`), `htc_pay_transactions` và `htc_pay_sessions`. Migration được **tự động nạp** khi chạy `migrate`. Nếu muốn chỉnh sửa, hãy publish ra ứng dụng:
+
+```bash
+php artisan vendor:publish --tag=hitechcloud-migrations
+php artisan migrate
+```
+
+Có thể đổi connection / tiền tố bảng / tắt lưu DB qua cấu hình `hitechcloudpay.database` (xem `.env` bên dưới). Đặt `HITECHCLOUDPAY_DB_PERSIST=false` nếu không muốn lưu webhook vào DB.
 
 ## Cấu hình `.env`
 
@@ -372,6 +395,195 @@ vendor/bin/phpunit
 ```
 
 Bộ test dùng `orchestra/testbench` và Guzzle `MockHandler` (không gọi mạng thật).
+
+## SDK hợp nhất - các sản phẩm khác
+
+Dùng facade `HiTechCloud` (hoặc inject `HiTechCloud\HiTechCloud`) để truy cập mọi sản phẩm. Mỗi accessor trả về client của module tương ứng:
+
+```php
+use HiTechCloud\Facades\HiTechCloud;
+
+HiTechCloud::pay();      // = module Pay (tương đương facade HiTechCloudPay)
+HiTechCloud::ekyc();     // eKYC / VNeID
+HiTechCloud::pos();      // POS
+HiTechCloud::omni();     // Omnichannel
+HiTechCloud::crm();      // CRM
+HiTechCloud::waf();      // WAF
+HiTechCloud::saleAi();   // Sale AI
+HiTechCloud::tools();    // API Tools
+HiTechCloud::userApi();  // User API
+```
+
+Chỉ cần khai báo `.env` cho những module bạn dùng (xem `config/hitechcloudpay.php` để biết đầy đủ khoá):
+
+```dotenv
+# POS
+HITECHCLOUDPAY_POS_TOKEN=
+HITECHCLOUDPAY_POS_WEBHOOK_SECRET=
+
+# Omnichannel
+HITECHCLOUDPAY_OMNI_TOKEN=
+HITECHCLOUDPAY_OMNI_WEBHOOK_SECRET=
+
+# CRM (token tĩnh HOẶC OAuth2 client credentials)
+HITECHCLOUDPAY_CRM_TOKEN=
+HITECHCLOUDPAY_CRM_CLIENT_ID=
+HITECHCLOUDPAY_CRM_CLIENT_SECRET=
+HITECHCLOUDPAY_CRM_WEBHOOK_SECRET=
+
+# WAF (CSRF -> login -> token)
+HITECHCLOUDPAY_WAF_USERNAME=
+HITECHCLOUDPAY_WAF_PASSWORD=
+
+# Sale AI
+HITECHCLOUDPAY_SALEAI_TOKEN=
+HITECHCLOUDPAY_SALEAI_PAGE_TOKEN=
+HITECHCLOUDPAY_SALEAI_WEBHOOK_SECRET=
+
+# API Tools
+HITECHCLOUDPAY_TOOLS_API_KEY=
+
+# User API (login) / sandbox dùng ote.hitechcloud.vn
+HITECHCLOUDPAY_USERAPI_USERNAME=
+HITECHCLOUDPAY_USERAPI_PASSWORD=
+
+# eKYC / VNeID (ký RSA) - OFF tới khi khai báo đủ
+HITECHCLOUDPAY_EKYC_AGENT_CODE=
+HITECHCLOUDPAY_EKYC_PRIVATE_KEY=
+HITECHCLOUDPAY_EKYC_AES_KEY=
+```
+
+### POS
+
+```php
+$pos = HiTechCloud::pos();
+$pos->shops()->list();
+$pos->products()->list('shop_0a1b2c3d', ['page' => 1]);
+$pos->orders()->create('shop_0a1b2c3d', [/* ... */]);
+$pos->orders()->updateStatus('shop_0a1b2c3d', 'order_1001', ['status' => 'confirmed']);
+$pos->inventory()->adjust('shop_0a1b2c3d', [/* ... */]);
+$pos->analytics()->sale('shop_0a1b2c3d', ['from' => '2026-10-01']);
+```
+
+### Omnichannel
+
+```php
+$omni = HiTechCloud::omni();
+$omni->channels()->list();
+$conv = $omni->conversations()->list(['status' => 'open']);
+$omni->conversations()->sendMessage('cnv_01HZ', ['text' => 'Xin chào']);
+$omni->conversations()->assign('cnv_01HZ', ['agent_id' => 'usr_1']);
+$omni->stats()->channels(['range' => '7d']);
+```
+
+### CRM
+
+```php
+$crm = HiTechCloud::crm();
+$crm->contacts()->create(['name' => 'Nguyễn Văn A', 'email' => 'a@vd.vn']);
+$crm->deals()->update('deal_a19c330e', ['stage_id' => 'won']);
+$crm->pipelines()->stages('pl_sales');
+$crm->activities()->create(['type' => 'call', 'contact_id' => 'con_1']);
+```
+
+### WAF
+
+```php
+$waf = HiTechCloud::waf();
+$waf->sites()->list();
+$waf->certificates()->list();
+$waf->reports()->get('123');
+$waf->authDefense()->users();
+```
+
+### Sale AI
+
+```php
+$ai = HiTechCloud::saleAi();
+$ai->bots()->list();
+$ai->bots()->sendMessage('bot_7c1a9f2e', ['text' => 'Giá bao nhiêu?']);
+$ai->ai()->handover(['conversation_id' => 'cnv_1']);
+```
+
+### API Tools
+
+```php
+$tools = HiTechCloud::tools();
+$tools->geoIp()->lookup('8.8.8.8');
+$tools->finance()->rates();
+$tools->domain()->whois('hitechcloud.vn');
+$tools->barcode()->validate('8934588123456');
+// Gọi trực tiếp một tool bất kỳ:
+$tools->call('/api/health/drugs', ['q' => 'paracetamol']);
+```
+
+### User API
+
+```php
+$user = HiTechCloud::userApi();
+$user->account()->balance();
+$user->services()->list();
+$user->services()->reboot('svc_123');
+$user->domains()->availability('vidu.vn');
+```
+
+### eKYC / VNeID
+
+> Module eKYC yêu cầu ký RSA (SHA256withRSA) và đăng ký agent với C06. Lược đồ mã hoá chính xác phụ thuộc hợp đồng tích hợp; module **tắt** tới khi khai báo đủ `ekyc.*`.
+
+```php
+$ekyc = HiTechCloud::ekyc();
+$tx = $ekyc->session('face-matching')->init([/* payload */]);   // POST /{service-code}/api/agent/init
+$ekyc->session('face-matching')->getTransaction(['transaction_id' => $tx['id'] ?? '']);
+$ekyc->shareInfo()->init([/* ... */]);
+$ekyc->sso()->userInfo([/* ... */]);
+```
+
+## Route & Webhook (tất cả module)
+
+SDK tự đăng ký các route nhận webhook (POST) dưới tiền tố cấu hình được (mặc định `hitechcloud/webhooks`), mỗi route đứng sau middleware xác minh chữ ký:
+
+| Route | Loại chữ ký | Header |
+| --- | --- | --- |
+| `POST {prefix}/pay` | biến động số dư | `X-HiTechCloud-Signature` + `X-HiTechCloud-Timestamp` |
+| `POST {prefix}/gateway` | IPN cổng thanh toán | `X-HiTechCloud-Signature` |
+| `POST {prefix}/bankhub` | BankHub | `X-HiTechCloud-BankHub-Signature` |
+| `POST {prefix}/einvoice` | Hoá đơn điện tử | `X-HTC-Signature` |
+| `POST {prefix}/omni` | Omnichannel | `X-HTC-Signature` |
+| `POST {prefix}/crm` | CRM | `X-CRM-Signature` |
+| `POST {prefix}/sale-ai` | Sale AI | `X-SaleAI-Signature` |
+| `POST {prefix}/pos` | POS | `X-HitechPos-Signature` |
+
+Cấu hình trong `config/hitechcloudpay.php` (`webhooks`):
+
+```php
+'webhooks' => [
+    'enabled'    => true,                    // false để tự quản lý route
+    'prefix'     => 'hitechcloud/webhooks',  // HITECHCLOUDPAY_WEBHOOK_PREFIX
+    'middleware' => ['api'],
+    // ... admin_api_key, admin_url
+],
+```
+
+Controller mặc định (`HiTechCloud\Http\Controllers\WebhookController`) sẽ: lưu một bản ghi `htc_pay_webhook_events` (dedup theo `event_id`), phát event Laravel và đẩy job hàng đợi. Lắng nghe các event sau để xử lý nghiệp vụ:
+
+```php
+use HiTechCloud\Events\WebhookReceived;   // mọi webhook
+use HiTechCloud\Events\PaymentSucceeded;
+use HiTechCloud\Events\PaymentFailed;
+use HiTechCloud\Events\RefundCompleted;
+use HiTechCloud\Events\BalanceChanged;
+
+// App\Providers\EventServiceProvider
+protected $listen = [
+    PaymentSucceeded::class => [MarkOrderPaid::class],
+    BalanceChanged::class   => [ReconcileTransaction::class],
+];
+```
+
+Job `HiTechCloud\Jobs\ProcessWebhookJob` (implements `ShouldQueue`) đánh dấu `processed_at` sau khi xử lý; bạn có thể mở rộng hoặc thay thế listener theo nhu cầu.
+
+Muốn **tự định tuyến**: đặt `HITECHCLOUDPAY_WEBHOOK_ROUTES=false` rồi tự khai báo route với middleware `HiTechCloud\Pay\Webhook\VerifyWebhookSignature` (tham số loại: `transaction|gateway|bankhub|einvoice|omni|crm|saleai|pos`).
 
 ## Giấy phép
 

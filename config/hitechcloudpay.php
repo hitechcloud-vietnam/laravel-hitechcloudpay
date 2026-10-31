@@ -135,6 +135,129 @@ return [
         'admin_url' => $sandbox
             ? env('HITECHCLOUDPAY_ADMIN_URL', 'https://sandbox.my.hitechcloud.vn')
             : env('HITECHCLOUDPAY_ADMIN_URL', 'https://my.hitechcloud.vn'),
+
+        // Route nhận webhook do SDK tự đăng ký (routes/hitechcloudpay.php).
+        // enabled=false để tự quản lý route trong ứng dụng.
+        'enabled' => (bool) env('HITECHCLOUDPAY_WEBHOOK_ROUTES', true),
+        'prefix' => env('HITECHCLOUDPAY_WEBHOOK_PREFIX', 'hitechcloud/webhooks'),
+        'middleware' => ['api'],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Lưu trữ (Database)
+    |--------------------------------------------------------------------------
+    | persist      : có lưu webhook/giao dịch vào DB không.
+    | connection   : tên connection (null = mặc định của ứng dụng).
+    | table_prefix : tiền tố đặt trước tên bảng htc_pay_*.
+    */
+    'database' => [
+        'persist' => (bool) env('HITECHCLOUDPAY_DB_PERSIST', true),
+        'connection' => env('HITECHCLOUDPAY_DB_CONNECTION'),
+        'table_prefix' => env('HITECHCLOUDPAY_DB_PREFIX', ''),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | eKYC / VNeID (ekyc-c06.hitechcloud.vn) - cổng đại lý C06
+    |--------------------------------------------------------------------------
+    | Ký request bằng RSA (SHA256withRSA); payload có thể mã hoá AES.
+    | TẮT tới khi khai báo agent_code + private_key và đăng ký với C06.
+    */
+    'ekyc' => [
+        'base_url' => env('HITECHCLOUDPAY_EKYC_URL', 'https://ekyc-c06.hitechcloud.vn'),
+        'agent_code' => env('HITECHCLOUDPAY_EKYC_AGENT_CODE'),
+        'private_key' => env('HITECHCLOUDPAY_EKYC_PRIVATE_KEY'),
+        'public_key' => env('HITECHCLOUDPAY_EKYC_PUBLIC_KEY'),
+        'aes_key' => env('HITECHCLOUDPAY_EKYC_AES_KEY'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | POS (pos.hitechcloud.vn) - HiTechPos
+    |--------------------------------------------------------------------------
+    */
+    'pos' => [
+        'base_url' => env('HITECHCLOUDPAY_POS_URL', 'https://pos.hitechcloud.vn'),
+        'token' => env('HITECHCLOUDPAY_POS_TOKEN'),
+        'webhook_secret' => env('HITECHCLOUDPAY_POS_WEBHOOK_SECRET'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Omnichannel (omni.hitechcloud.vn)
+    |--------------------------------------------------------------------------
+    */
+    'omni' => [
+        'base_url' => env('HITECHCLOUDPAY_OMNI_URL', 'https://omni.hitechcloud.vn'),
+        'token' => env('HITECHCLOUDPAY_OMNI_TOKEN'),
+        'webhook_secret' => env('HITECHCLOUDPAY_OMNI_WEBHOOK_SECRET'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | CRM (crm-gateways.hitechcloud.vn)
+    |--------------------------------------------------------------------------
+    | Dùng token tĩnh HOẶC OAuth2 client credentials.
+    */
+    'crm' => [
+        'base_url' => env('HITECHCLOUDPAY_CRM_URL', 'https://crm-gateways.hitechcloud.vn'),
+        'token' => env('HITECHCLOUDPAY_CRM_TOKEN'),
+        'client_id' => env('HITECHCLOUDPAY_CRM_CLIENT_ID'),
+        'client_secret' => env('HITECHCLOUDPAY_CRM_CLIENT_SECRET'),
+        'webhook_secret' => env('HITECHCLOUDPAY_CRM_WEBHOOK_SECRET'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | WAF (vcwaf.hitechcloud.vn)
+    |--------------------------------------------------------------------------
+    | Luồng CSRF -> login -> token; hoặc cấu hình sẵn token tĩnh.
+    */
+    'waf' => [
+        'base_url' => env('HITECHCLOUDPAY_WAF_URL', 'https://vcwaf.hitechcloud.vn'),
+        'username' => env('HITECHCLOUDPAY_WAF_USERNAME'),
+        'password' => env('HITECHCLOUDPAY_WAF_PASSWORD'),
+        'token' => env('HITECHCLOUDPAY_WAF_TOKEN'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Sale AI (sale-ai.hitechcloud.vn)
+    |--------------------------------------------------------------------------
+    */
+    'saleai' => [
+        'base_url' => $sandbox
+            ? env('HITECHCLOUDPAY_SALEAI_URL', 'https://sale-ai-sandbox.hitechcloud.vn')
+            : env('HITECHCLOUDPAY_SALEAI_URL', 'https://sale-ai.hitechcloud.vn'),
+        'token' => env('HITECHCLOUDPAY_SALEAI_TOKEN'),
+        'page_access_token' => env('HITECHCLOUDPAY_SALEAI_PAGE_TOKEN'),
+        'webhook_secret' => env('HITECHCLOUDPAY_SALEAI_WEBHOOK_SECRET'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | API Tools (api-tools.hitechcloud.vn)
+    |--------------------------------------------------------------------------
+    */
+    'tools' => [
+        'base_url' => env('HITECHCLOUDPAY_TOOLS_URL', 'https://api-tools.hitechcloud.vn'),
+        'api_key' => env('HITECHCLOUDPAY_TOOLS_API_KEY'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | User API (api.hitechcloud.vn / ote.hitechcloud.vn khi sandbox)
+    |--------------------------------------------------------------------------
+    | Đăng nhập username/password -> Bearer token; hoặc token tĩnh.
+    */
+    'userapi' => [
+        'base_url' => $sandbox
+            ? env('HITECHCLOUDPAY_USERAPI_URL', 'https://ote.hitechcloud.vn')
+            : env('HITECHCLOUDPAY_USERAPI_URL', 'https://api.hitechcloud.vn'),
+        'username' => env('HITECHCLOUDPAY_USERAPI_USERNAME'),
+        'password' => env('HITECHCLOUDPAY_USERAPI_PASSWORD'),
+        'token' => env('HITECHCLOUDPAY_USERAPI_TOKEN'),
     ],
 
 ];

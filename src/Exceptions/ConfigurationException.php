@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace HiTechCloud\Pay\Exceptions;
+namespace HiTechCloud\Exceptions;
 
 /**
- * Ném ra khi thiếu hoặc sai cấu hình (ví dụ: chưa khai báo merchant_id,
- * secret_key, access token hay client credentials cần thiết).
+ * Ném ra khi thiếu hoặc sai cấu hình của một module (host, token, client
+ * credentials, API key...).
  */
-class ConfigurationException extends HiTechCloudPayException
+class ConfigurationException extends HiTechCloudException
 {
 }

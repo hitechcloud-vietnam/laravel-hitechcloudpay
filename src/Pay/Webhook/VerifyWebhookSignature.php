@@ -22,12 +22,13 @@ use Symfony\Component\HttpFoundation\Response;
  *   Route::post('/webhooks/bankhub', BankHubController::class)
  *        ->middleware(VerifyWebhookSignature::class.':bankhub');
  *
- * Các "type" hỗ trợ: transaction (mặc định), gateway, bankhub, einvoice.
+ * Các "type" hỗ trợ: transaction (mặc định), gateway, bankhub, einvoice,
+ * omni, crm, saleai, pos.
  */
 class VerifyWebhookSignature
 {
     /**
-     * @param string $type transaction|gateway|bankhub|einvoice
+     * @param string $type transaction|gateway|bankhub|einvoice|omni|crm|saleai|pos
      */
     public function handle(Request $request, Closure $next, string $type = 'transaction')
     {
@@ -67,6 +68,34 @@ class VerifyWebhookSignature
                     $rawBody,
                     (string) $request->header('X-HiTechCloud-Signature', ''),
                     (string) config('hitechcloudpay.gateway.secret_key')
+                );
+
+            case 'omni':
+                return Signature::verifyRawBody(
+                    $rawBody,
+                    (string) $request->header('X-HTC-Signature', ''),
+                    (string) config('hitechcloudpay.omni.webhook_secret')
+                );
+
+            case 'crm':
+                return Signature::verifyRawBody(
+                    $rawBody,
+                    (string) $request->header('X-CRM-Signature', ''),
+                    (string) config('hitechcloudpay.crm.webhook_secret')
+                );
+
+            case 'saleai':
+                return Signature::verifyRawBody(
+                    $rawBody,
+                    (string) $request->header('X-SaleAI-Signature', ''),
+                    (string) config('hitechcloudpay.saleai.webhook_secret')
+                );
+
+            case 'pos':
+                return Signature::verifyRawBody(
+                    $rawBody,
+                    (string) $request->header('X-HitechPos-Signature', ''),
+                    (string) config('hitechcloudpay.pos.webhook_secret')
                 );
 
             case 'transaction':
