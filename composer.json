@@ -1,0 +1,68 @@
+{
+    "name": "hitechcloud/laravel-hitechcloudpay",
+    "description": "SDK Laravel chính thức cho HiTechCloud Pay - cổng thanh toán, QR VietQR/NAPAS, Pay API v2 (bank-accounts, virtual accounts, transactions), webhook biến động số dư, loa SoundBox, hoá đơn điện tử và Open Banking (BankHub).",
+    "keywords": [
+        "laravel",
+        "hitechcloud",
+        "payment",
+        "payment-gateway",
+        "vietqr",
+        "napas",
+        "virtual-account",
+        "open-banking",
+        "e-invoice",
+        "soundbox",
+        "webhook",
+        "vietnam"
+    ],
+    "homepage": "https://pay.hitechcloud.vn",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "HiTechCloud",
+            "email": "dev@hitechcloud.vn",
+            "homepage": "https://hitechcloud.vn",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/hitechcloud-vietnam/laravel-hitechcloudpay/issues",
+        "source": "https://github.com/hitechcloud-vietnam/laravel-hitechcloudpay",
+        "docs": "https://developers.hitechcloud.vn"
+    },
+    "require": {
+        "php": "^8.0",
+        "illuminate/support": "^9.0|^10.0|^11.0|^12.0|^13.0",
+        "illuminate/contracts": "^9.0|^10.0|^11.0|^12.0|^13.0",
+        "guzzlehttp/guzzle": "^7.4"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.5|^10|^11",
+        "orchestra/testbench": "^7|^8|^9|^10"
+    },
+    "autoload": {
+        "psr-4": {
+            "HiTechCloud\\Pay\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "HiTechCloud\\Pay\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "HiTechCloud\\Pay\\HiTechCloudPayServiceProvider"
+            ],
+            "aliases": {
+                "HiTechCloudPay": "HiTechCloud\\Pay\\Facades\\HiTechCloudPay"
+            }
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
